@@ -1,85 +1,110 @@
-<!--
-Facilitador para conversão de conteúdo retornado em base64 permitindo rápida visualização e download de xml, pdf e zip
-Desenvolvido por marcos.prazeres
-[1.1] 2017-09-20 - Criada a função 'opcao(tipo)' e 'embutido(tipo)'; Ajustado para a visualização do pdf funcionar no navegador Chrome
-[1.0] 2017-09-19 - Versão inicial
--->
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Cole o conteúdo em Base64 e baixe o arquivo convertido em PDF, ZIP ou XML (o formato é detectado automaticamente).">
     <title>AtomicWeb - Base64</title>
-    <style>
-        * {
-            font-family: Verdana, Geneva, Tahoma, sans-serif;
-            font-size: 12px;
-            text-align: center;
-        }
 
-        p {
-            line-height: 30px;
-        }
+    <!-- Open Graph / Redes Sociais -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://atomicweb.com.br/base64">
+    <meta property="og:title" content="AtomicWeb - Base64">
+    <meta property="og:description" content="Cole o conteúdo em Base64 e baixe o arquivo convertido em PDF, ZIP ou XML (o formato é detectado automaticamente).">
+    <meta property="og:image" content="img/logo192.png">
 
-        a {
-            cursor: pointer;
-            text-decoration: none;
-            color: #555;
-            background-color: #ddd;
-            padding: 8px;
-            border-radius: 5px;
-        }
+    <!-- Favicon e Ícones -->
+    <link rel="icon" type="image/svg+xml" href="img/react.svg" />
+    <link rel="apple-touch-icon" href="img/logo192.png">
 
-        a:hover {
-            background-color: #ccc;
-        }
-
-        textarea {
-            border: 4px solid #ddd;
-            padding: 5px;
-            height: 300px;
-            width: 95%;
-            text-align: left;
-        }
-
-        #msg {
-            color: #ff0000;
-        }
-    </style>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-    <h2>AtomicWeb - Base64</h2>
-    <p><textarea id="input" onclick="this.select()"></textarea></p>
-    <p>
-        <a id="limpar" onclick="limpa()">LIMPAR</a>
-        <a id="converter" onclick="converte()">CONVERTER</a>
-    </p>
-    <p><textarea id="output" readonly="readonly"></textarea></p>
-    <p><span id="msg"></span></p>
-    <p>
-        <span id="opcaoBaixar"></span>
-        <span id="opcaoVisualizar"></span>
-    </p>
+<body class="bg-gray-100 text-gray-800 font-sans">
+
+    <div class="w-[95%] mx-auto p-4 space-y-6">
+        <!-- Cabeçalho -->
+        <header class="flex flex-col sm:flex-row items-center justify-between pb-3 border-b border-gray-200 gap-3">
+            <a href="https://atomicweb.com.br/" class="flex items-center hover:opacity-80 transition" title="Ir para AtomicWeb">
+                <img src="img/logo.svg" alt="Logo" width="30" height="30" class="mr-2"/>
+                <span class="text-xl font-bold text-blue-900">AtomicWeb</span>
+            </a>
+            <!-- <h1 class="text-2xl font-bold text-gray-700 text-center">Base64</h1> -->
+            <a href="https://github.com/claudemirtech/base64" target="_blank" rel="noopener noreferrer" class="inline-flex items-center text-blue-700 hover:text-blue-900 font-medium text-sm transition" title="Ver código no GitHub">
+                <svg class="w-4 h-4 mr-1.5 fill-current" viewBox="0 0 24 24">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+                </svg>
+                GitHub
+            </a>
+        </header>
+
+        <!-- Input Textarea -->
+        <div>
+            <textarea id="input" class="w-full h-[300px] p-3 border border-gray-300 rounded-lg text-left focus:ring-2 focus:ring-indigo-500" onclick="this.select()"></textarea>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex justify-center space-x-4">
+            <button id="limpar" onclick="limpa()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg shadow-md transition duration-200">LIMPAR</button>
+            <button id="converter" onclick="converte()" class="bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-lg shadow-md transition duration-200">CONVERTER</button>
+        </div>
+
+        <!-- Output Textarea -->
+        <div>
+            <textarea id="output" readonly class="w-full h-[300px] p-3 border border-gray-300 rounded-lg text-left bg-gray-50 focus:ring-2 focus:ring-indigo-500"></textarea>
+        </div>
+
+        <!-- Error/Info Message -->
+        <p id="msgContainer" role="alert" class="hidden fixed left-1/2 top-4 z-50 w-max max-w-[95vw] -translate-x-1/2 rounded-lg border border-red-200 bg-white px-4 py-3 text-center shadow-lg">
+            <span id="msg" class="text-red-500"></span>
+        </p>
+
+        <!-- Download/View Options -->
+        <div class="flex justify-center space-x-4">
+            <span id="opcaoBaixar" class="text-indigo-600"></span>
+            <span id="opcaoVisualizar" class="text-indigo-600"></span>
+        </div>
+
+        <!-- Rodapé informativo -->
+        <div class="mt-8 p-4 bg-blue-50 rounded-lg border border-blue-200 flex flex-col sm:flex-row items-center justify-between text-sm text-blue-900">
+            <div class="flex items-center mb-3 sm:mb-0">
+                <svg class="w-5 h-5 text-blue-600 mr-2.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9 18h6"></path>
+                    <path d="M10 22h4"></path>
+                    <path d="M12 2a7 7 0 0 0-7 7c0 2.38 1.19 4.47 3 5.74V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2.26c1.81-1.27 3-3.36 3-5.74a7 7 0 0 0-7-7z"></path>
+                </svg>
+                <span><strong>Dica:</strong> Cole a string em base64 para decodificar e baixar o arquivo (PDF, ZIP ou XML).</span>
+            </div>
+            <a href="https://github.com/claudemirtech/base64" target="_blank" rel="noopener noreferrer" class="inline-flex items-center text-blue-700 hover:text-blue-900 font-medium">
+                <svg class="w-4 h-4 mr-1.5 fill-current" viewBox="0 0 24 24">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+                </svg>
+                GitHub
+            </a>
+        </div>
+    </div>
+
     <script>
         function $(id) {
-
             return document.getElementById(id);
+        }
 
+        function mensagem(texto) {
+            $('msg').textContent = texto;
+            $('msgContainer').classList.toggle('hidden', !texto);
         }
 
         function limpa() {
-
             $('input').value = '';
             $('output').value = '';
-            $('msg').innerHTML = '';
+            mensagem('');
             $('opcaoBaixar').innerHTML = '';
             $('opcaoVisualizar').innerHTML = '';
-
         }
 
         function converte() {
-
             $('output').value = '';
-            $('msg').innerHTML = '';
+            mensagem('');
             $('opcaoBaixar').innerHTML = '';
             $('opcaoVisualizar').innerHTML = '';
             var input = $('input').value;
@@ -90,17 +115,15 @@ Desenvolvido por marcos.prazeres
                     opcao(tipo);
                 }
                 catch (erro) {
-                    $('msg').innerHTML = 'ERRO: NÃO FOI POSSÍVEL REALIZAR A CONVERSÃO';
+                    mensagem('ERRO: NÃO FOI POSSÍVEL REALIZAR A CONVERSÃO');
                 }
             }
             else {
-                $('msg').innerHTML = 'ATENÇÃO: FALTOU INFORMAR O CONTEÚDO EM BASE64 PARA REALIZAR A CONVERSÃO';
+                mensagem('ATENÇÃO: FALTOU INFORMAR O CONTEÚDO EM BASE64 PARA REALIZAR A CONVERSÃO');
             }
-
         }
 
         function arquivo(identificador) {
-
             if (identificador === '%PDF') {
                 return 'pdf';
             }
@@ -111,37 +134,32 @@ Desenvolvido por marcos.prazeres
                 return 'xml';
             }
             return 'etc';
-
         }
 
         function opcao(tipo) {
-
             var input = $('input').value;
             if (tipo !== 'etc') {
                 var agora = new Date().toLocaleDateString('pt-BR', { day: 'numeric', month: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric' }).split(' ').join('-');
-                $('opcaoBaixar').innerHTML = '<a id="baixar" download="' + agora + '.' + tipo + '" href="data:application/' + tipo + ';base64,' + input + '">BAIXAR ' + tipo.toUpperCase() + '</a>';
+                $('opcaoBaixar').innerHTML = '<a id="baixar" download="' + agora + '.' + tipo + '" href="data:application/' + tipo + ';base64,' + input + '" class="bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700">BAIXAR ' + tipo.toUpperCase() + '</a>';
                 if (tipo == 'pdf') {
-                    // BUGFIX: Adicionada esta alternativa devido a restrição do navegador Chrome para chamadas diretas ao 'data:'
                     if (navigator.userAgent.indexOf('Chrome') !== -1) {
-                        $('opcaoVisualizar').innerHTML = '<a id="visualizar" onclick="embutido(\'' + tipo + '\')">VISUALIZAR ' + tipo.toUpperCase() + '</a>';
+                        $('opcaoVisualizar').innerHTML = '<a id="visualizar" onclick="embutido(\'' + tipo + '\')" class="bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700 cursor-pointer">VISUALIZAR ' + tipo.toUpperCase() + '</a>';
                     }
                     else {
-                        $('opcaoVisualizar').innerHTML = '<a id="visualizar" target="_new" href="data:application/' + tipo + ';base64,' + input + '">VISUALIZAR ' + tipo.toUpperCase() + '</a>';
+                        $('opcaoVisualizar').innerHTML = '<a id="visualizar" target="_new" href="data:application/' + tipo + ';base64,' + input + '" class="bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700">VISUALIZAR ' + tipo.toUpperCase() + '</a>';
                     }
                 }
             }
-
         }
 
-        // BUGFIX: Adicionada esta alternativa devido a restrição do navegador Chrome para chamadas diretas ao 'data:'
         function embutido(tipo) {
-
             var input = $('input').value;
             var pagina = window.open('about:blank');
             pagina.document.write('<embed width="100%" height="100%" src="data:application/' + tipo + ';base64,' + input + '" type="application/' + tipo + '">');
             pagina.document.close();
-
         }
     </script>
+
 </body>
+
 </html>
