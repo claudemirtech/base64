@@ -1,83 +1,65 @@
 <!--
 Facilitador para conversão de conteúdo retornado em base64 permitindo rápida visualização e download de xml, pdf e zip
-Desenvolvido por marcos.prazeres
 [1.1] 2017-09-20 - Criada a função 'opcao(tipo)' e 'embutido(tipo)'; Ajustado para a visualização do pdf funcionar no navegador Chrome
 [1.0] 2017-09-19 - Versão inicial
 -->
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AtomicWeb - Base64</title>
-    <style>
-        * {
-            font-family: Verdana, Geneva, Tahoma, sans-serif;
-            font-size: 12px;
-            text-align: center;
-        }
-
-        p {
-            line-height: 30px;
-        }
-
-        a {
-            cursor: pointer;
-            text-decoration: none;
-            color: #555;
-            background-color: #ddd;
-            padding: 8px;
-            border-radius: 5px;
-        }
-
-        a:hover {
-            background-color: #ccc;
-        }
-
-        textarea {
-            border: 4px solid #ddd;
-            padding: 5px;
-            height: 300px;
-            width: 95%;
-            text-align: left;
-        }
-
-        #msg {
-            color: #ff0000;
-        }
-    </style>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-    <h2>AtomicWeb - Base64</h2>
-    <p><textarea id="input" onclick="this.select()"></textarea></p>
-    <p>
-        <a id="limpar" onclick="limpa()">LIMPAR</a>
-        <a id="converter" onclick="converte()">CONVERTER</a>
-    </p>
-    <p><textarea id="output" readonly="readonly"></textarea></p>
-    <p><span id="msg"></span></p>
-    <p>
-        <span id="opcaoBaixar"></span>
-        <span id="opcaoVisualizar"></span>
-    </p>
+
+<body class="bg-gray-100 text-gray-800 font-sans">
+
+    <div class="max-w-3xl mx-auto p-4 space-y-6">
+        <!-- Title -->
+        <h2 class="text-2xl font-bold text-center text-gray-700">AtomicWeb - Base64</h2>
+
+        <!-- Input Textarea -->
+        <div>
+            <textarea id="input" class="w-full h-40 p-3 border border-gray-300 rounded-lg text-left focus:ring-2 focus:ring-indigo-500" onclick="this.select()"></textarea>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex justify-center space-x-4">
+            <button id="limpar" onclick="limpa()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg shadow-md transition duration-200">LIMPAR</button>
+            <button id="converter" onclick="converte()" class="bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-lg shadow-md transition duration-200">CONVERTER</button>
+        </div>
+
+        <!-- Output Textarea -->
+        <div>
+            <textarea id="output" readonly class="w-full h-40 p-3 border border-gray-300 rounded-lg text-left bg-gray-50 focus:ring-2 focus:ring-indigo-500"></textarea>
+        </div>
+
+        <!-- Error/Info Message -->
+        <p><span id="msg" class="text-red-500"></span></p>
+
+        <!-- Download/View Options -->
+        <div class="flex justify-center space-x-4">
+            <span id="opcaoBaixar" class="text-indigo-600"></span>
+            <span id="opcaoVisualizar" class="text-indigo-600"></span>
+        </div>
+    </div>
+
     <script>
         function $(id) {
-
             return document.getElementById(id);
-
         }
 
         function limpa() {
-
             $('input').value = '';
             $('output').value = '';
             $('msg').innerHTML = '';
             $('opcaoBaixar').innerHTML = '';
             $('opcaoVisualizar').innerHTML = '';
-
         }
 
         function converte() {
-
             $('output').value = '';
             $('msg').innerHTML = '';
             $('opcaoBaixar').innerHTML = '';
@@ -96,11 +78,9 @@ Desenvolvido por marcos.prazeres
             else {
                 $('msg').innerHTML = 'ATENÇÃO: FALTOU INFORMAR O CONTEÚDO EM BASE64 PARA REALIZAR A CONVERSÃO';
             }
-
         }
 
         function arquivo(identificador) {
-
             if (identificador === '%PDF') {
                 return 'pdf';
             }
@@ -111,37 +91,32 @@ Desenvolvido por marcos.prazeres
                 return 'xml';
             }
             return 'etc';
-
         }
 
         function opcao(tipo) {
-
             var input = $('input').value;
             if (tipo !== 'etc') {
                 var agora = new Date().toLocaleDateString('pt-BR', { day: 'numeric', month: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric' }).split(' ').join('-');
-                $('opcaoBaixar').innerHTML = '<a id="baixar" download="' + agora + '.' + tipo + '" href="data:application/' + tipo + ';base64,' + input + '">BAIXAR ' + tipo.toUpperCase() + '</a>';
+                $('opcaoBaixar').innerHTML = '<a id="baixar" download="' + agora + '.' + tipo + '" href="data:application/' + tipo + ';base64,' + input + '" class="bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700">BAIXAR ' + tipo.toUpperCase() + '</a>';
                 if (tipo == 'pdf') {
-                    // BUGFIX: Adicionada esta alternativa devido a restrição do navegador Chrome para chamadas diretas ao 'data:'
                     if (navigator.userAgent.indexOf('Chrome') !== -1) {
-                        $('opcaoVisualizar').innerHTML = '<a id="visualizar" onclick="embutido(\'' + tipo + '\')">VISUALIZAR ' + tipo.toUpperCase() + '</a>';
+                        $('opcaoVisualizar').innerHTML = '<a id="visualizar" onclick="embutido(\'' + tipo + '\')" class="bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700 cursor-pointer">VISUALIZAR ' + tipo.toUpperCase() + '</a>';
                     }
                     else {
-                        $('opcaoVisualizar').innerHTML = '<a id="visualizar" target="_new" href="data:application/' + tipo + ';base64,' + input + '">VISUALIZAR ' + tipo.toUpperCase() + '</a>';
+                        $('opcaoVisualizar').innerHTML = '<a id="visualizar" target="_new" href="data:application/' + tipo + ';base64,' + input + '" class="bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700">VISUALIZAR ' + tipo.toUpperCase() + '</a>';
                     }
                 }
             }
-
         }
 
-        // BUGFIX: Adicionada esta alternativa devido a restrição do navegador Chrome para chamadas diretas ao 'data:'
         function embutido(tipo) {
-
             var input = $('input').value;
             var pagina = window.open('about:blank');
             pagina.document.write('<embed width="100%" height="100%" src="data:application/' + tipo + ';base64,' + input + '" type="application/' + tipo + '">');
             pagina.document.close();
-
         }
     </script>
+
 </body>
+
 </html>
